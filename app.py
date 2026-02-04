@@ -77,26 +77,20 @@ def extract_form_data(text: str):
     }
     text_norm = ' '.join(text.split()).upper()
 
-    # CNPJ
     if match := re.search(r'(\d{2}[.\s]?\d{3}[.\s]?\d{3}[/\s]?\d{4}[-\s]?\d{2})', text_norm):
-        data['cnpj'] = re.sub(r'[.\s/-]', '', match.group(1))
-    # Year
+        data['cnpj'] = match.group(1)
     if match := re.search(r'EXERC[IÍ]CIO[:\s]+(\d{4})', text_norm):
         data['ano'] = match.group(1)
-    # PDDE Type
     if match := re.search(r'PDDE\s+(B[AÁ]SICO|QUALIDADE|EQUIDADE)', text_norm):
         data['tipo_pdde'] = match.group(1)
-    # School Name
     if match := re.search(r'NOME DA RAZ[AÃ]O SOCIAL\s+(?:CEC DA\s+)?(.+?)(?:,|\n|Processo:)', text, re.I):
         escola = match.group(1).strip()
         data['escola'] = re.sub(r'^(CRECHE MUNICIPAL|C M|E M|EDI|ESCOLAR MUNICIPAL)\s+', '', escola, flags=re.I).strip()
     elif match := re.search(r'CONSELHO ESCOLAR COMUNIT[AÁ]RIO \(CEC\) DA (.+?)(?:,|\n|Processo:)', text, re.I):
         escola = match.group(1).strip()
         data['escola'] = re.sub(r'^(CRECHE MUNICIPAL|C M|E M|EDI|ESCOLAR MUNICIPAL)\s+', '', escola, flags=re.I).strip()
-    # President Name
     if match := re.search(r'(?:PRESIDENTE(?: DO CEC)?|ASSINATURA)[:\s,]+([A-Z\s]{5,})(?=\n)', text_norm):
         data['presidente'] = match.group(1).strip()
-    # SEI Process
     if match := re.search(r'(\d{7}\.\d{6}/\d{4}-\d{2})', text_norm):
         data['processo'] = match.group(1)
     return data
@@ -105,18 +99,43 @@ def merge_pdfs(file_list, output_path):
     if not file_list: return
     subprocess.run(['pdfunite'] + file_list + [output_path], check=True)
 
-def create_dispatch_html(tipo_pdde, ano, escola, presidente, processo):
-    # Using placeholders for data that might be missing
-    p_style = "text-align: justify; line-height: 1.5; font-family: Arial; font-size: 12pt;"
+def create_dispatch_html(tipo_pdde, ano, escola, presidente, processo, cnpj):
+    p_style = "text-align: justify; line-height: 1.5; font-family: Arial, sans-serif; font-size: 12pt;"
     tipo_pdde_str = tipo_pdde or '[TIPO NÃO ENCONTRADO]'
     ano_str = ano or '[ANO NÃO ENCONTRADO]'
     escola_str = escola or '[ESCOLA NÃO ENCONTRADA]'
     presidente_str = presidente or '[PRESIDENTE NÃO ENCONTRADO]'
     processo_str = processo or '[PROCESSO NÃO ENCONTRADO]'
+    cnpj_str = cnpj or '[CNPJ NÃO ENCONTRADO]'
 
-    dispatch1 = f'''<!DOCTYPE html><html>...</html>''' # Templates kept for brevity
-    dispatch2 = f'''<!DOCTYPE html><html>...</html>'''
-    dispatch3 = f'''<!DOCTYPE html><html>...</html>'''
+    # 1. Ofício de Encaminhamento (Escola -> CRE)
+    dispatch1 = f'''<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Ofício de Encaminhamento</title></head><body style="font-family: Arial, sans-serif; font-size: 12pt;">
+        <p>Ao(À) S.r.(a). Coordenador(a) da E/ 4ª CRE</p>
+        <p><strong>Assunto:</strong> Prestação de Contas – FNDE/ PDDE {tipo_pdde_str}/{ano_str}</p><br>
+        <p>Senhor(a) Coordenador(a),</p>
+        <p style="{p_style}">Encaminho, em conformidade com as normas em vigor, a Prestação de Contas dos recursos recebidos por este Conselho Escolar Comunitário - CEC, em razão do Programa PDDE {tipo_pdde_str}/{ano_str}.</p>
+        <br><br><br>
+        <p style="text-align: center;">_________________________________________</p>
+        <p style="text-align: center;">{presidente_str}</p>
+        <p style="text-align: center;">Presidente do CEC</p>
+    </body></html>'''
+
+    # 2. Informação Técnica (Analista -> Coordenador)
+    dispatch2 = f'''<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Informação Técnica</title></head><body style="font-family: Arial, sans-serif; font-size: 12pt;">
+        <p>À Srª COORDENADORA DA 4ª CRE,</p><br>
+        <p style="{p_style}">Após análise da documentação apresentada, informo que a prestação de contas referente ao Programa Dinheiro Direto na Escola – PDDE {tipo_pdde_str}/{ano_str}, vinculada ao Conselho Escolar Comunitário (CEC) da {escola_str}, inscrito no CNPJ sob o nº {cnpj_str}, sob a presidência de {presidente_str}, encontra-se em condições de aprovação, por atender às normatizações e orientações vigentes do Fundo Nacional de Desenvolvimento da Educação – FNDE, aplicáveis à matéria.</p>
+    </body></html>'''
+
+    # 3. Despacho de Aprovação (Coordenador)
+    dispatch3 = f'''<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Despacho de Aprovação</title></head><body style="font-family: Arial, sans-serif; font-size: 12pt;">
+        <p><strong>DESPACHO DA COORDENADORIA</strong></p><br>
+        <p style="{p_style}">De acordo.</p>
+        <p style="{p_style}">Considerando a análise técnica que aponta a regularidade da documentação apresentada pelo CEC da {escola_str}, referente ao PDDE {tipo_pdde_str}/{ano_str} (Processo nº {processo_str}), <strong>aprovo</strong> a prestação de contas em questão.</p>
+        <br><br><br>
+        <p style="text-align: center;">_________________________________________</p>
+        <p style="text-align: center;">Coordenador(a) da 4ª CRE</p>
+    </body></html>'''
+
     return dispatch1, dispatch2, dispatch3
 
 @app.route('/')
@@ -172,9 +191,28 @@ def process():
 
         merge_pdfs(combined_order, os.path.join(outdir, f"00_PACOTE_COMPLETO_{name_base}.pdf"))
         
-        # Dispatch Generation (remains the same)
+        dispatch1_html, dispatch2_html, dispatch3_html = create_dispatch_html(
+            form_data['tipo_pdde'], form_data['ano'], form_data['escola'], 
+            form_data['presidente'], form_data['processo'], form_data['cnpj']
+        )
+        
+        data_por_extenso = datetime.now().strftime("%d de %B de %Y")
+        # No need to replace data_por_extenso in templates, but keeping for future use
 
-        # Verification Report Generation
+        html_paths = []
+        dispatch_names = [
+            f"04_OFICIO_ENCAMINHAMENTO_{name_base}.docx",
+            f"05_INFORMACAO_TECNICA_{name_base}.docx",
+            f"06_DESPACHO_APROVACAO_{name_base}.docx"
+        ]
+        for i, (html, docx_name) in enumerate(zip([dispatch1_html, dispatch2_html, dispatch3_html], dispatch_names)):
+            html_path = os.path.join(tmpdir, f'despacho_{i+1}.html')
+            with open(html_path, 'w', encoding='utf-8') as hf:
+                hf.write(html)
+            docx_path = os.path.join(outdir, docx_name)
+            subprocess.run(['pandoc', html_path, '-f', 'html', '-t', 'docx', '-o', docx_path], check=True)
+            html_paths.append(html_path)
+
         report_path = os.path.join(outdir, "_RELATORIO_DE_VERIFICACAO.txt")
         with open(report_path, 'w', encoding='utf-8') as rf:
             rf.write("-----------------------------------------\n")
@@ -189,13 +227,12 @@ def process():
             rf.write("ARQUIVOS PROCESSADOS E SEUS GRUPOS:\n")
             for gnum, group_name_key in group_names.items():
                 rf.write(f"\nGrupo {gnum} - {os.path.basename(group_name_key).split('_', 1)[1].rsplit('_', 4)[0].replace('_', ' ')}:\n")
-                if file_mapping[gnum]:
+                if file_mapping.get(gnum):
                     for fname in sorted(file_mapping[gnum]):
                         rf.write(f"  - {fname}\n")
                 else:
                     rf.write("  - Nenhum arquivo nesta categoria.\n")
 
-        # Create ZIP archive
         zip_path = os.path.join(tmpdir, f'pacote_{name_base}.zip')
         with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zf:
             for item in sorted(os.listdir(outdir)):
