@@ -3,161 +3,197 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDDE - Gerador de Pacotes Otimizado</title>
+    <title>Otimizador de Prestação de Contas - PDDE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #007bff;
+            --primary-color: #0d6efd;
             --secondary-color: #6c757d;
-            --background-color: #f8f9fa;
-            --text-color: #333;
+            --background-color: #f4f7fc;
             --card-background: #ffffff;
-            --border-radius: 8px;
-            --box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            --text-color: #212529;
+            --border-color: #dee2e6;
+            --success-color: #198754;
+            --font-family: 'Roboto', sans-serif;
         }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-family: var(--font-family);
             margin: 0;
-            padding: 2em;
+            padding: 2rem;
             background-color: var(--background-color);
             color: var(--text-color);
-            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
         .container {
-            max-width: 800px;
-            margin: 0 auto;
+            max-width: 600px;
+            width: 100%;
             background-color: var(--card-background);
-            padding: 2rem;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-        }
-        h1 {
-            color: var(--primary-color);
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
             text-align: center;
-            margin-bottom: 1.5rem;
         }
-        p {
-            text-align: justify;
-            margin-bottom: 1.5rem;
-        }
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-        label {
-            font-weight: bold;
+        .header h1 {
+            color: var(--primary-color);
+            font-weight: 700;
+            font-size: 2.25rem;
             margin-bottom: 0.5rem;
         }
-        input[type="text"], input[type="file"] {
-            width: 100%;
-            padding: 0.75em;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-            transition: border-color 0.3s;
+        .header p {
+            color: var(--secondary-color);
+            font-size: 1.1rem;
+            margin-bottom: 2.5rem;
         }
-        input[type="text"]:focus, input[type="file"]:focus {
+        .upload-area {
+            border: 3px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 3rem;
+            background-color: #fcfdff;
+            transition: border-color 0.3s, background-color 0.3s;
+            cursor: pointer;
+        }
+        .upload-area.dragover {
             border-color: var(--primary-color);
-            outline: none;
+            background-color: #e9f2ff;
         }
-        button {
-            padding: 0.85em 1.5em;
-            font-size: 1.1em;
-            font-weight: bold;
+        .upload-area input[type="file"] {
+            display: none;
+        }
+        .upload-icon {
+            font-size: 4rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+        .upload-text {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: var(--secondary-color);
+        }
+        .upload-text span {
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+        #file-list {
+            margin-top: 1.5rem;
+            text-align: left;
+            font-size: 0.9rem;
+            color: var(--secondary-color);
+        }
+        #file-list div {
+            margin-bottom: 0.5rem;
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1.2rem;
+            font-weight: 700;
             color: #fff;
             background-color: var(--primary-color);
             border: none;
-            border-radius: 4px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: background-color 0.3s;
+            margin-top: 2rem;
+            transition: background-color 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 15px rgba(13, 110, 253, 0.2);
         }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-        .file-upload-wrapper {
-            border: 2px dashed #ccc;
-            padding: 2rem;
-            text-align: center;
-            cursor: pointer;
-            transition: border-color 0.3s;
-        }
-        .file-upload-wrapper:hover {
-            border-color: var(--primary-color);
-        }
-        .file-upload-wrapper input[type="file"] {
-            display: none;
-        }
-        .file-upload-label {
-            color: var(--secondary-color);
+        .submit-btn:hover {
+            background-color: #0b5ed7;
+            box-shadow: 0 6px 20px rgba(13, 110, 253, 0.3);
         }
         .footer {
-            text-align: center;
             margin-top: 2rem;
-            color: var(--secondary-color);
-            font-size: 0.9em;
+            font-size: 0.85rem;
+            color: #adb5bd;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>PDDE - Gerador de Pacotes Otimizado</h1>
-        <p>
-            Bem-vindo à ferramenta de automação para a prestação de contas do PDDE. Simplifique seu trabalho enviando os documentos em PDF e preenchendo as informações da sua unidade escolar. O sistema organizará tudo, gerará os despachos necessários e entregará um arquivo ZIP pronto para o SEI.
-        </p>
-        <form action="/process" method="post" enctype="multipart/form-data">
-            <div class="form-group file-upload-wrapper" onclick="document.getElementById('pdfs').click();">
-                <input type="file" name="pdfs" id="pdfs" multiple required accept="application/pdf" onchange="updateFileLabel()">
-                <label for="pdfs" class="file-upload-label" id="file-label">Clique aqui ou arraste e solte os arquivos PDF</label>
-            </div>
+        <div class="header">
+            <h1>Otimizador de Contas PDDE</h1>
+            <p>Envie os PDFs e receba um pacote ZIP organizado e pronto para o SEI.</p>
+        </div>
 
-            <div class="form-group">
-                <label for="tipo_pdde">Tipo de PDDE (Ex: BASICO, QUALIDADE, EQUIDADE)</label>
-                <input type="text" name="tipo_pdde" id="tipo_pdde" value="BASICO" required>
+        <form action="/process" method="post" enctype="multipart/form-data" id="upload-form">
+            <div class="upload-area" id="upload-area">
+                <input type="file" name="pdfs" id="pdfs" multiple required accept="application/pdf">
+                <div class="upload-icon">&#x1F4C2;</div>
+                <div class="upload-text" id="upload-text">
+                    Arraste e solte seus arquivos aqui ou <span>clique para selecionar</span>.
+                </div>
             </div>
-
-            <div class="form-group">
-                <label for="ano">Ano da Prestação de Contas</label>
-                <input type="text" name="ano" id="ano" value="2025" required>
-            </div>
-
-            <div class="form-group">
-                <label for="escola">Nome da Unidade Escolar (Escola/Creche)</label>
-                <input type="text" name="escola" id="escola" placeholder="Ex: E.M. PROFESSORA JOANA" required>
-            </div>
-
-            <div class="form-group">
-                <label for="presidente">Nome do Presidente do CEC</label>
-                <input type="text" name="presidente" id="presidente" placeholder="Ex: JOÃO DA SILVA" required>
-            </div>
-
-            <div class="form-group">
-                <label for="processo">Número do Processo SEI</label>
-                <input type="text" name="processo" id="processo" placeholder="Ex: 0000000.000000/AAAA-NN">
-            </div>
-
-            <button type="submit">Gerar Pacote de Prestação de Contas</button>
+            <div id="file-list"></div>
+            <button type="submit" class="submit-btn">Gerar Pacote de Prestação de Contas</button>
         </form>
+
+        <div class="footer">
+            <p>Uma ferramenta para a 4ª CRE &copy; 2024</p>
+        </div>
     </div>
-    <div class="footer">
-        <p>Desenvolvido para otimizar o fluxo de trabalho da 4ª CRE.</p>
-    </div>
+
     <script>
-        function updateFileLabel() {
-            const fileInput = document.getElementById('pdfs');
-            const fileLabel = document.getElementById('file-label');
-            if (fileInput.files.length > 0) {
-                if (fileInput.files.length === 1) {
-                    fileLabel.textContent = fileInput.files[0].name;
-                } else {
-                    fileLabel.textContent = `${fileInput.files.length} arquivos selecionados`;
-                }
-            } else {
-                fileLabel.textContent = 'Clique aqui ou arraste e solte os arquivos PDF';
+        const uploadArea = document.getElementById('upload-area');
+        const fileInput = document.getElementById('pdfs');
+        const uploadText = document.getElementById('upload-text');
+        const fileList = document.getElementById('file-list');
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, () => uploadArea.classList.add('dragover'), false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, () => uploadArea.classList.remove('dragover'), false);
+        });
+
+        uploadArea.addEventListener('drop', handleDrop, false);
+        fileInput.addEventListener('change', handleFileSelect, false);
+
+        function handleDrop(e) {
+            fileInput.files = e.dataTransfer.files;
+            updateFileList();
+        }
+
+        function handleFileSelect() {
+            updateFileList();
+        }
+
+        function updateFileList() {
+            fileList.innerHTML = ''; 
+            if (!fileInput.files.length) {
+                uploadText.innerHTML = 'Arraste e solte seus arquivos aqui ou <span>clique para selecionar</span>.';
+                return;
             }
+            
+            const fileCount = fileInput.files.length;
+            uploadText.innerHTML = `<strong>${fileCount} arquivo${fileCount > 1 ? 's' : ''} selecionado${fileCount > 1 ? 's' : ''}</strong>`;
+
+            const list = document.createElement('ul');
+            list.style.listStyleType = 'none';
+            list.style.padding = 0;
+
+            for (const file of fileInput.files) {
+                const listItem = document.createElement('li');
+                listItem.textContent = file.name;
+                listItem.style.whiteSpace = 'nowrap';
+                listItem.style.overflow = 'hidden';
+                listItem.style.textOverflow = 'ellipsis';
+                list.appendChild(listItem);
+            }
+            fileList.appendChild(list);
         }
     </script>
 </body>

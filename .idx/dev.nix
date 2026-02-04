@@ -10,6 +10,8 @@
     pkgs.python311Packages.pip
     pkgs.pandoc
     pkgs.poppler_utils
+    pkgs.python311Packages.flask
+    pkgs.python311Packages.pymupdf
   ];
 
   # Sets environment variables in the workspace
@@ -24,16 +26,13 @@
     previews = {
       enable = true;
       previews = {
-        # web = {
-        #   # Example: run "npm run dev" with PORT set to IDX's defined port for previews,
-        #   # and show it in IDX's web preview panel
-        #   command = ["npm" "run" "dev"];
-        #   manager = "web";
-        #   env = {
-        #     # Environment variables to set for your server
-        #     PORT = "$PORT";
-        #   };
-        # };
+        web = {
+          command = ["python", "app.py"];
+          manager = "web";
+          env = {
+            PORT = "$PORT";
+          };
+        };
       };
     };
 
