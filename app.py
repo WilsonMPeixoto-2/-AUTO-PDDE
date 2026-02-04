@@ -24,7 +24,7 @@ import zipfile
 import unicodedata
 from datetime import datetime
 import locale
-from flask import Flask, render_template, request, send_file
+from flask import Flask, render_template, request, send_file, jsonify
 import fitz  # PyMuPDF
 
 app = Flask(__name__)
@@ -141,6 +141,11 @@ def create_dispatch_html(tipo_pdde, ano, escola, presidente, processo, cnpj):
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/health')
+def health_check():
+    """Health check endpoint"""
+    return jsonify(status="ok"), 200
 
 @app.route('/process', methods=['POST'])
 def process():
