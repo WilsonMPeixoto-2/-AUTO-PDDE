@@ -1,0 +1,4 @@
+Flask
+# The application also relies on system packages:
+# - pdfunite (part of poppler-utils)
+# - pandoc
