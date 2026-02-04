@@ -39,7 +39,7 @@ def slugify(value: str) -> str:
     if not value: return ''
     value_norm = unicodedata.normalize('NFKD', value).encode('ASCII', 'ignore').decode()
     value_norm = value_norm.replace(' ', '_').replace('-', '_')
-    return ''.join(ch for ch in value_norm if ch.isalnum() or ch == '_').upper()
+    return ''.join(ch for ch in value_norm if ch.isalnum() or ch == '_').lower()
 
 def determine_order_index(filename: str) -> int:
     name = filename.lower()
@@ -161,7 +161,7 @@ def process():
         full_text = extract_text_from_pdfs(files)
         form_data = extract_form_data(full_text)
 
-        name_base = f"PDDE_{slugify(form_data['tipo_pdde'])}_{slugify(form_data['ano'])}__{slugify(form_data['escola'])}__{slugify(form_data['cnpj'])}"
+        name_base = f"pdde_{slugify(form_data['tipo_pdde'])}_{slugify(form_data['ano'])}_{slugify(form_data['escola'])}_{slugify(form_data['cnpj'])}"
 
         group_files = {1: [], 2: [], 3: []}
         file_mapping = {1: [], 2: [], 3: [], 'outros': []}
@@ -180,16 +180,16 @@ def process():
         os.makedirs(outdir, exist_ok=True)
 
         group_names = {
-            1: f"01_INSTRUCAO_E_CONSOLIDACAO_{name_base}.pdf",
-            2: f"02_COMPROVACAO_DE_DESPESAS_{name_base}.pdf",
-            3: f"03_DECLARACOES_E_PARECERES_{name_base}.pdf",
+            1: f"01_instrucao_e_consolidacao_{name_base}.pdf",
+            2: f"02_comprovacao_de_despesas_{name_base}.pdf",
+            3: f"03_declaracoes_e_pareceres_{name_base}.pdf",
         }
         for gnum, paths in group_files.items():
             if paths:
                 sorted_paths = sorted(paths, key=lambda p: (determine_order_index(os.path.basename(p)), os.path.basename(p)))
                 merge_pdfs(sorted_paths, os.path.join(outdir, group_names[gnum]))
 
-        merge_pdfs(combined_order, os.path.join(outdir, f"00_PACOTE_COMPLETO_{name_base}.pdf"))
+        merge_pdfs(combined_order, os.path.join(outdir, f"00_pacote_completo_{name_base}.pdf"))
         
         dispatch1_html, dispatch2_html, dispatch3_html = create_dispatch_html(
             form_data['tipo_pdde'], form_data['ano'], form_data['escola'], 
@@ -201,9 +201,9 @@ def process():
 
         html_paths = []
         dispatch_names = [
-            f"04_OFICIO_ENCAMINHAMENTO_{name_base}.docx",
-            f"05_INFORMACAO_TECNICA_{name_base}.docx",
-            f"06_DESPACHO_APROVACAO_{name_base}.docx"
+            f"04_oficio_encaminhamento_{name_base}.docx",
+            f"05_informacao_tecnica_{name_base}.docx",
+            f"06_despacho_aprovacao_{name_base}.docx"
         ]
         for i, (html, docx_name) in enumerate(zip([dispatch1_html, dispatch2_html, dispatch3_html], dispatch_names)):
             html_path = os.path.join(tmpdir, f'despacho_{i+1}.html')
@@ -213,7 +213,7 @@ def process():
             subprocess.run(['pandoc', html_path, '-f', 'html', '-t', 'docx', '-o', docx_path], check=True)
             html_paths.append(html_path)
 
-        report_path = os.path.join(outdir, "_RELATORIO_DE_VERIFICACAO.txt")
+        report_path = os.path.join(outdir, "_relatorio_de_verificacao.txt")
         with open(report_path, 'w', encoding='utf-8') as rf:
             rf.write("-----------------------------------------\n")
             rf.write(" RELATÓRIO DE VERIFICAÇÃO AUTOMÁTICA\n")
