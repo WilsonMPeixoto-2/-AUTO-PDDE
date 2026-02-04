@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>PDDE - Construtor de Pacotes</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2em; }
+        form { max-width: 600px; margin: 0 auto; }
+        label { display: block; margin-top: 1em; font-weight: bold; }
+        input[type="text"], input[type="file"] { width: 100%; padding: 0.5em; margin-top: 0.5em; }
+        button { margin-top: 1.5em; padding: 0.75em 1.5em; font-size: 1em; }
+    </style>
+</head>
+<body>
+    <h1>PDDE - Gerador de Pacotes e Despachos</h1>
+    <p>Envie os PDFs da prestação de contas e informe os dados da unidade escolar. O aplicativo irá organizar os documentos, gerar os despachos e retornar um arquivo ZIP com tudo pronto.</p>
+    <form action="/process" method="post" enctype="multipart/form-data">
+        <label for="pdfs">Selecione os PDFs</label>
+        <input type="file" name="pdfs" id="pdfs" multiple required accept="application/pdf">
+        <label for="tipo_pdde">Tipo de PDDE (BASICO/QUALIDADE/EQUIDADE)</label>
+        <input type="text" name="tipo_pdde" id="tipo_pdde" value="BASICO" required>
+        <label for="ano">Ano</label>
+        <input type="text" name="ano" id="ano" value="2025" required>
+        <label for="escola">Unidade Escolar (escola/creche)</label>
+        <input type="text" name="escola" id="escola" placeholder="Nome da Escola" required>
+        <label for="presidente">Presidente do CEC</label>
+        <input type="text" name="presidente" id="presidente" placeholder="Nome do Presidente" required>
+        <label for="processo">Número do processo SEI</label>
+        <input type="text" name="processo" id="processo" placeholder="0000000.000000/AAAA-NN">
+        <button type="submit">Gerar Pacote</button>
+    </form>
+</body>
+</html>
