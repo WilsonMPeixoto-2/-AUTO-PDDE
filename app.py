@@ -35,6 +35,10 @@ try:
 except locale.Error:
     locale.setlocale(locale.LC_TIME, '') # Use default locale
 
+@app.route('/health')
+def health():
+    return jsonify(status="ok"), 200
+
 def slugify(value: str) -> str:
     if not value: return ''
     value_norm = unicodedata.normalize('NFKD', value).encode('ASCII', 'ignore').decode()
@@ -141,11 +145,6 @@ def create_dispatch_html(tipo_pdde, ano, escola, presidente, processo, cnpj):
 @app.route('/')
 def index():
     return render_template('index.html')
-
-@app.route('/health')
-def health_check():
-    """Health check endpoint"""
-    return jsonify(status="ok"), 200
 
 @app.route('/process', methods=['POST'])
 def process():

@@ -2,9 +2,6 @@ services:
   - type: web
     name: auto-pdde
     env: docker
+    autoDeploy: true
+    region: oregon
     healthCheckPath: /health
-    envVars:
-      - key: PYTHON_VERSION
-        value: '3.11' # Garante a versão do Python
-      - key: PYTHONUNBUFFERED # Recomendado para logs em contêineres
-        value: 'True'
