@@ -161,7 +161,7 @@ def process():
         full_text = extract_text_from_pdfs(files)
         form_data = extract_form_data(full_text)
 
-        name_base = f"PDDE_{slugify(form_data['tipo_pdde'])}_{slugify(form_data['ano'])}_{slugify(form_data['escola'])}_{slugify(form_data['cnpj'])}"
+        name_base = f"PDDE_{slugify(form_data['tipo_pdde'])}_{slugify(form_data['ano'])}__{slugify(form_data['escola'])}__{slugify(form_data['cnpj'])}"
 
         group_files = {1: [], 2: [], 3: []}
         file_mapping = {1: [], 2: [], 3: [], 'outros': []}
@@ -241,4 +241,6 @@ def process():
         return send_file(zip_path, as_attachment=True, download_name=os.path.basename(zip_path))
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    import os
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
