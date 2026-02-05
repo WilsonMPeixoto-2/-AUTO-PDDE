@@ -116,7 +116,6 @@ def create_dispatch_html(tipo_pdde, ano, escola, presidente, processo, cnpj):
     dispatch1 = f'''<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Ofício de Encaminhamento</title></head><body style="font-family: Arial, sans-serif; font-size: 12pt;">
         <p>Ao(À) S.r.(a). Coordenador(a) da E/ 4ª CRE</p>
         <p><strong>Assunto:</strong> Prestação de Contas – FNDE/ PDDE {tipo_pdde_str}/{ano_str}</p><br>
-        <p>Senhor(a) Coordenador(a),</p>
         <p style="{p_style}">Encaminho, em conformidade com as normas em vigor, a Prestação de Contas dos recursos recebidos por este Conselho Escolar Comunitário - CEC, em razão do Programa PDDE {tipo_pdde_str}/{ano_str}.</p>
         <br><br><br>
         <p style="text-align: center;">_________________________________________</p>
@@ -244,7 +243,8 @@ def process():
         
         return send_file(zip_path, as_attachment=True, download_name=os.path.basename(zip_path))
 
-if __name__ == '__main__':
-    import os
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
+# The following lines are not needed for Vercel
+# if __name__ == '__main__':
+#     import os
+#     port = int(os.environ.get("PORT", 5000))
+#     app.run(host='0.0.0.0', port=port)

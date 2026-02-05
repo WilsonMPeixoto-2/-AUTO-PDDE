@@ -1,7 +1,0 @@
-services:
-  - type: web
-    name: auto-pdde
-    env: docker
-    autoDeploy: true
-    region: oregon
-    healthCheckPath: /health

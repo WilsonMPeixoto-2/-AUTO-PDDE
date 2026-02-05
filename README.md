@@ -48,22 +48,20 @@ sudo apt-get install pandoc poppler-utils
 
 3.  **Inicie a aplicação:**
     ```bash
-    gunicorn --workers 4 --bind 0.0.0.0:5000 app:app
+    python app.py
     ```
 
 4.  **Acesse a aplicação:**
     Abra seu navegador e acesse [http://localhost:5000](http://localhost:5000).
 
-## Deploy na Nuvem com Render
+## Deploy na Nuvem com Vercel
 
-Este projeto está configurado para um deploy fácil e **gratuito** na plataforma [Render](https://render.com/).
+Este projeto está configurado para um deploy fácil e **gratuito** na plataforma [Vercel](https://vercel.com/).
 
-Graças ao arquivo `render.yaml` no repositório, o processo é quase todo automático:
-
-1.  **Crie uma conta gratuita no Render** usando seu perfil do GitHub (não é necessário cartão de crédito).
-2.  No painel do Render, clique em **New > Blueprint**.
+1.  **Crie uma conta gratuita no Vercel** usando seu perfil do GitHub.
+2.  No painel do Vercel, clique em **Add New... > Project**.
 3.  Conecte seu repositório `WilsonMPeixoto-2/-AUTO-PDDE`.
-4.  O Render irá ler o arquivo `render.yaml` e pré-configurar o serviço.
-5.  Clique em **Create** e aguarde o processo de build e deploy ser concluído.
+4.  O Vercel irá detectar automaticamente que é uma aplicação Python e usar as configurações do `vercel.json`.
+5.  Clique em **Deploy** e aguarde o processo de build e deploy ser concluído.
 
-A aplicação estará disponível em uma URL pública fornecida pelo Render.
+A aplicação estará disponível em uma URL pública fornecida pela Vercel.
